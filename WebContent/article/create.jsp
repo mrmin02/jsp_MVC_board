@@ -22,7 +22,7 @@
 	
 %>
 <c:if test="${message}!=null">
-<script>alert(${message});</script>
+<script>alert("${message}");</script>
 </c:if>
 	<form action="/article/createArticle.do" method="post">
 		<br><h5>Á¦¸ñ</h5><br>

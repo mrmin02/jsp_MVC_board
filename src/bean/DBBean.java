@@ -6,8 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -33,7 +31,7 @@ public class DBBean {
 		PreparedStatement pstmt = null;
 		
 		conn = getConnection();
-		String sql="insert into users(user_id,password,name,email,admin,phone) values(?,?,?,?,0,?)";
+		String sql="insert into users(id,user_id,password,name,email,admin,phone) values(user_incre.NEXTVAL,?,?,?,?,0,?)";
 		
 		pstmt = conn.prepareStatement(sql);
 		pstmt.setString(1, user_id);
@@ -82,7 +80,7 @@ public class DBBean {
 		}
 		return result;
 	}
-	public Map<String, String> getUserInfo(String id)throws Exception{
+	public UserDataBean getUserInfo(String id)throws Exception{
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -95,26 +93,21 @@ public class DBBean {
 		rs = pstmt.executeQuery();
 		rs.next();
 		
-		Map<String, String> user = new HashMap<String, String>();
+//		ArrayList<UserDataBean> userInfo = new ArrayList<UserDataBean>();
 		
-		user.put("admin", rs.getString("admin"));
-		user.put("name", rs.getString("name"));
-		user.put("email", rs.getString("email"));
-		user.put("phone", rs.getString("phone"));
+		UserDataBean data = new UserDataBean();
+		data.setName(rs.getString("name"));
+		data.setAdmin(rs.getString("admin"));
+		data.setEmail(rs.getString("email"));
+		data.setPhone(rs.getString("phone"));
+		data.setId( Integer.parseInt(rs.getString("id")));
+		data.setUser_id(rs.getString("user_id"));
 		
-		return user;
+//		userInfo.add(data);
+		
+		return data;
 	}
-	public void getArticleList()throws Exception{
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
-		conn = getConnection();
-		String sql="select * from articles order by created_time DESC";
-		
-//		pstmt = conn.prepareStatement(sql);
-//		pstmt.setString(1, id);
-	}
+
 	public int addArticle(String title, String content, String id)throws Exception{
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -126,7 +119,7 @@ public class DBBean {
 		SimpleDateFormat form = new SimpleDateFormat("yyyyMMddHHmmss");
 		String time = form.format(date);
 		
-		String sql="insert into articles(title,content,user_id,created_time) values(?,?,?,?)";
+		String sql="insert into articles(id,title,content,user_id,created_time) values(article_incre.NEXTVAL,?,?,?,?)";
 		
 		pstmt = conn.prepareStatement(sql);
 		pstmt.setString(1, title);
@@ -140,6 +133,48 @@ public class DBBean {
 		}else {
 			state = -1;
 			System.out.println("새 글 등록 실패");
+		}
+		return state;
+	}
+	public int updateArticle(String title, String content,String id) throws Exception {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		conn = getConnection();
+		String sql="update articles set title=?,content=? where id = ? ";
+		
+		int state= 0;
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, title);
+		pstmt.setString(2, content);
+		pstmt.setString(3, id);
+		rs = pstmt.executeQuery();
+		if(rs.next()) {
+			System.out.println("수정 완료");
+		}else {
+			System.out.println("수정 오류 발생");
+			state= 1;
+		}
+		return state;
+	}
+	public int deleteArticle(String id) throws Exception{
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		conn = getConnection();
+		String sql="delete from articles where id=?";
+		
+		int state= 0;
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, id);
+		rs = pstmt.executeQuery();
+		if(rs.next()) {
+			System.out.println("삭제 완료");
+		}else {
+			System.out.println("삭제 오류 발생");
+			state= 1;
 		}
 		return state;
 	}
