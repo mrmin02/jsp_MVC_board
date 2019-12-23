@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.naming.Context;
@@ -177,5 +178,53 @@ public class DBBean {
 			state= 1;
 		}
 		return state;
+	}
+	public int addAnswer(String article_id, String user_id, String answer) throws Exception{
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		conn = getConnection();
+		String sql="insert into answers(id,user_id, article_id, answer)  values(ans_incre.NEXTVAL,?,?,?)";
+		
+		int state= 0;
+		System.out.println(user_id+"  "+article_id+"  "+answer);
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, user_id);
+		pstmt.setString(2, article_id);
+		pstmt.setString(3, answer);
+		rs = pstmt.executeQuery();
+		if(rs.next()) {
+			System.out.println("새로운 댓글 등록 완료");
+		}else {
+			System.out.println("댓글 등록 실패");
+			state= 1;
+		}
+		return state;
+	}
+	public ArrayList<AnswerDataBean> answerList(String article_id) throws Exception{
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		conn = getConnection();
+		String sql="select * from answers where article_id = ?";
+		
+		int state= 0;
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, article_id);
+		rs = pstmt.executeQuery();
+		ArrayList<AnswerDataBean> dataList = new ArrayList<AnswerDataBean>();
+		
+		while(rs.next()) {
+			System.out.println(rs.getString("id"));
+			AnswerDataBean data = new AnswerDataBean();
+			data.setId(rs.getString("id"));
+			data.setArticle_id(rs.getString("article_id"));
+			data.setUser_id(rs.getString("user_id"));
+			data.setText(rs.getString("answer"));
+			dataList.add(data);
+		}
+		return dataList;
 	}
 }
