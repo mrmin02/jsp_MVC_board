@@ -9,16 +9,15 @@ import bean.AnswerDataBean;
 import bean.DBBean;
 import main.action.Action;
 
-public class AddAnswerAction implements Action{
+public class AnswerDeleteAction implements Action{
 
 	@Override
 	public String requestProcess(HttpServletRequest request, HttpServletResponse response) throws Throwable {
 		System.out.println("AddAnswerAction");
 		String article_id = request.getParameter("article_id");
-		String user_id = request.getParameter("user_id");
-		String answer = request.getParameter("answer");
+		String answer_id = request.getParameter("answer_id");
 		DBBean db = DBBean.getInstance();
-		int state = db.addAnswer(article_id,user_id,answer);
+		int state = db.deleteAnswer(answer_id);
 		String result = "성공";
 		if(state == -1) {
 			result = "실패";
@@ -27,5 +26,5 @@ public class AddAnswerAction implements Action{
 		request.setAttribute("article", article);
 		return "/article/addAnswerOk.jsp";
 	}
-	
+
 }

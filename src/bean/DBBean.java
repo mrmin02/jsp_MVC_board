@@ -208,7 +208,7 @@ public class DBBean {
 		ResultSet rs = null;
 		
 		conn = getConnection();
-		String sql="select * from answers where article_id = ?";
+		String sql="select * from answers where article_id = ?  order by id ASC";
 		
 		int state= 0;
 		pstmt = conn.prepareStatement(sql);
@@ -217,7 +217,7 @@ public class DBBean {
 		ArrayList<AnswerDataBean> dataList = new ArrayList<AnswerDataBean>();
 		
 		while(rs.next()) {
-			System.out.println(rs.getString("id"));
+//			System.out.println(rs.getString("id"));
 			AnswerDataBean data = new AnswerDataBean();
 			data.setId(rs.getString("id"));
 			data.setArticle_id(rs.getString("article_id"));
@@ -226,5 +226,60 @@ public class DBBean {
 			dataList.add(data);
 		}
 		return dataList;
+	}
+	public int updateAnswer(String answer_id,String text) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		int state = 0;
+		
+		try {
+			conn = getConnection();
+			String sql="update answers set answer=? where id = ?";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, text);
+			pstmt.setString(2, answer_id);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				state=0;
+				System.out.println("새 글 등록 성공");
+			}else {
+				state = -1;
+				System.out.println("새 글 등록 실패");
+			}
+			return state;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return -1;
+		}
+	}
+	public int deleteAnswer(String answer_id) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		int state = 0;
+		
+		try {
+			conn = getConnection();
+			String sql="delete answers where id = ?";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, answer_id);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				state=0;
+				System.out.println("새 글 등록 성공");
+			}else {
+				state = -1;
+				System.out.println("새 글 등록 실패");
+			}
+			return state;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return -1;
+		}
 	}
 }

@@ -10,9 +10,11 @@
 </head>
 <body>
 	<a href="/article/create.jsp">±Û¾²±â</a>
+	
 	<sql:query var="rs" dataSource="jdbc/orcl">
 			select * from articles order by created_time DESC
 	</sql:query>
+	
 	<table>
 		<tr>
 			<td>No</td>
@@ -27,6 +29,7 @@
 				<td>
 					<div style="width:50px; text-overflow: ellipsis;overflow: hidden;">
 					<a href="/article/show.jsp?id=<c:out value="${rs['id']}"></c:out>">
+						<c:set var="articleId" value="${rs['id']}"/>
 						<c:out value="${rs['title']}"></c:out>
 					</div>
 					</a>		
