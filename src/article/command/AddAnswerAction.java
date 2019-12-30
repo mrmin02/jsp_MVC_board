@@ -17,14 +17,15 @@ public class AddAnswerAction implements Action{
 		String article_id = request.getParameter("article_id");
 		String user_id = request.getParameter("user_id");
 		String answer = request.getParameter("answer");
+		
 		DBBean db = DBBean.getInstance();
 		int state = db.addAnswer(article_id,user_id,answer);
 		String result = "성공";
 		if(state == -1) {
 			result = "실패";
 		}
-		ArrayList<AnswerDataBean> article = db.answerList(article_id);
-		request.setAttribute("article", article);
+		ArrayList<AnswerDataBean> answerList = db.answerList(article_id);
+		request.setAttribute("answer", answerList);
 		return "/article/addAnswerOk.jsp";
 	}
 	

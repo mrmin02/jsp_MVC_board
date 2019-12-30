@@ -9,22 +9,18 @@ import bean.AnswerDataBean;
 import bean.DBBean;
 import main.action.Action;
 
-public class AnswerDeleteAction implements Action{
+public class AnswerLodingAction implements Action{
 
 	@Override
-	public String requestProcess(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-		System.out.println("AnswerDeleteAction");
-		String article_id = request.getParameter("article_id");
-		String answer_id = request.getParameter("answer_id");
+	public String requestProcess(HttpServletRequest request, HttpServletResponse response) throws Exception{
+		System.out.println("AnswerLodingAction");
+		String article_id =request.getParameter("article_id");
+	
 		DBBean db = DBBean.getInstance();
-		int state = db.deleteAnswer(answer_id);
-		String result = "성공";
-		if(state == -1) {
-			result = "실패";
-		}
+		
 		ArrayList<AnswerDataBean> answerList = db.answerList(article_id);
 		request.setAttribute("answer", answerList);
 		return "/article/addAnswerOk.jsp";
 	}
-
+	
 }

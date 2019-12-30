@@ -43,31 +43,7 @@
 	    </c:otherwise>
 	</c:choose>
 	<div><h4>댓글</h4></div>
-	<sql:query var="an" dataSource="jdbc/orcl">
-		select * from answers where article_id = <%= request.getParameter("id") %> order by id ASC
-	</sql:query>
 	<div class="answers">
-		<c:forEach var="an" items="${an.rows}">
-			ID <br>
-			<c:out value="${an['user_id']}"></c:out><br><br>
-			내용 <br>
-			<div class="newAnswer">
-				<c:out value="${an['answer']}"></c:out>
-			</div><br><br>
-			<c:choose>
-				<c:when test="${sessionScope.id eq an['user_id'] }">
-					<div class="newButton">
-						<button type="button" onclick="click_modify('${an['answer']}','${an['id']}','${an['article_id']}','${an['user_id']}','${sessionScope.admin}' )">수정</button>	
-					</div>
-					
-					<button type="button" onclick="deleteAnswer('${an['id']}','<c:out value="${param.id}"/>','${sessionScope.admin}' )">삭제</button>
-			    </c:when>
-			    <c:when test="${sessionScope.admin eq '1' }">
-					<button type="button" onclick="deleteAnswer('${an['id']}','<c:out value="${param.id}"/>','${sessionScope.admin}' )">삭제</button>
-			    </c:when>
-			</c:choose>
-			<br>
-		</c:forEach>
 	</div>
 </body>
 </html>

@@ -85,27 +85,36 @@ public class DBBean {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		
-		conn = getConnection();
-		String sql="select * from users where user_id =?";
-		
-		pstmt = conn.prepareStatement(sql);
-		pstmt.setString(1, id);
-		rs = pstmt.executeQuery();
-		rs.next();
-		
-//		ArrayList<UserDataBean> userInfo = new ArrayList<UserDataBean>();
-		
 		UserDataBean data = new UserDataBean();
-		data.setName(rs.getString("name"));
-		data.setAdmin(rs.getString("admin"));
-		data.setEmail(rs.getString("email"));
-		data.setPhone(rs.getString("phone"));
-		data.setId( Integer.parseInt(rs.getString("id")));
-		data.setUser_id(rs.getString("user_id"));
-		
-//		userInfo.add(data);
-		
+		try {
+			conn = getConnection();
+			String sql="select * from users where user_id =?";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, id);
+			rs = pstmt.executeQuery();
+			rs.next();
+			
+//			ArrayList<UserDataBean> userInfo = new ArrayList<UserDataBean>();
+			
+			
+			data.setName(rs.getString("name"));
+			data.setAdmin(rs.getString("admin"));
+			data.setEmail(rs.getString("email"));
+			data.setPhone(rs.getString("phone"));
+			data.setId( Integer.parseInt(rs.getString("id")));
+			data.setUser_id(rs.getString("user_id"));
+			
+//			userInfo.add(data);
+			
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally{
+			if(rs!=null) try {rs.close();}catch(SQLException ex) {}
+			if(pstmt!=null) try {pstmt.close();} catch(SQLException ex) {}
+			if(conn !=null) try{conn.close();} catch(SQLException ex) {}
+		}
 		return data;
 	}
 
@@ -183,22 +192,31 @@ public class DBBean {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		
-		conn = getConnection();
-		String sql="insert into answers(id,user_id, article_id, answer)  values(ans_incre.NEXTVAL,?,?,?)";
-		
 		int state= 0;
-		System.out.println(user_id+"  "+article_id+"  "+answer);
-		pstmt = conn.prepareStatement(sql);
-		pstmt.setString(1, user_id);
-		pstmt.setString(2, article_id);
-		pstmt.setString(3, answer);
-		rs = pstmt.executeQuery();
-		if(rs.next()) {
-			System.out.println("새로운 댓글 등록 완료");
-		}else {
-			System.out.println("댓글 등록 실패");
-			state= 1;
+		try {
+			conn = getConnection();
+			String sql="insert into answers(id,user_id, article_id, answer)  values(ans_incre.NEXTVAL,?,?,?)";
+			
+			
+			System.out.println(user_id+"  "+article_id+"  "+answer);
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, user_id);
+			pstmt.setString(2, article_id);
+			pstmt.setString(3, answer);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				System.out.println("새로운 댓글 등록 완료");
+			}else {
+				System.out.println("댓글 등록 실패");
+				state= 1;
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally{
+			if(rs!=null) try {rs.close();}catch(SQLException ex) {}
+			if(pstmt!=null) try {pstmt.close();} catch(SQLException ex) {}
+			if(conn !=null) try{conn.close();} catch(SQLException ex) {}
 		}
 		return state;
 	}
@@ -206,24 +224,32 @@ public class DBBean {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		
-		conn = getConnection();
-		String sql="select * from answers where article_id = ?  order by id ASC";
-		
-		int state= 0;
-		pstmt = conn.prepareStatement(sql);
-		pstmt.setString(1, article_id);
-		rs = pstmt.executeQuery();
 		ArrayList<AnswerDataBean> dataList = new ArrayList<AnswerDataBean>();
-		
-		while(rs.next()) {
-//			System.out.println(rs.getString("id"));
-			AnswerDataBean data = new AnswerDataBean();
-			data.setId(rs.getString("id"));
-			data.setArticle_id(rs.getString("article_id"));
-			data.setUser_id(rs.getString("user_id"));
-			data.setText(rs.getString("answer"));
-			dataList.add(data);
+		try {
+			conn = getConnection();
+			String sql="select * from answers where article_id = ?  order by id ASC";
+			
+			int state= 0;
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, article_id);
+			rs = pstmt.executeQuery();
+			
+			
+			while(rs.next()) {
+//				System.out.println(rs.getString("id"));
+				AnswerDataBean data = new AnswerDataBean();
+				data.setId(rs.getString("id"));
+				data.setArticle_id(rs.getString("article_id"));
+				data.setUser_id(rs.getString("user_id"));
+				data.setText(rs.getString("answer"));
+				dataList.add(data);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally{
+			if(rs!=null) try {rs.close();}catch(SQLException ex) {}
+			if(pstmt!=null) try {pstmt.close();} catch(SQLException ex) {}
+			if(conn !=null) try{conn.close();} catch(SQLException ex) {}
 		}
 		return dataList;
 	}
@@ -232,7 +258,7 @@ public class DBBean {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		int state = 0;
-		
+		System.out.println(text);
 		try {
 			conn = getConnection();
 			String sql="update answers set answer=? where id = ?";
@@ -243,17 +269,21 @@ public class DBBean {
 			rs = pstmt.executeQuery();
 			if(rs.next()) {
 				state=0;
-				System.out.println("새 글 등록 성공");
+				System.out.println("업데이트 성공");
 			}else {
 				state = -1;
 				System.out.println("새 글 등록 실패");
 			}
-			return state;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			
+		} catch(Exception e) {
 			e.printStackTrace();
 			return -1;
+		}finally{
+			if(rs!=null) try {rs.close();}catch(SQLException ex) {}
+			if(pstmt!=null) try {pstmt.close();} catch(SQLException ex) {}
+			if(conn !=null) try{conn.close();} catch(SQLException ex) {}
 		}
+		return state;
 	}
 	public int deleteAnswer(String answer_id) {
 		Connection conn = null;
@@ -275,11 +305,15 @@ public class DBBean {
 				state = -1;
 				System.out.println("새 글 등록 실패");
 			}
-			return state;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			
+		} catch(Exception e) {
 			e.printStackTrace();
 			return -1;
+		}finally{
+			if(rs!=null) try {rs.close();}catch(SQLException ex) {}
+			if(pstmt!=null) try {pstmt.close();} catch(SQLException ex) {}
+			if(conn !=null) try{conn.close();} catch(SQLException ex) {}
 		}
+		return state;
 	}
 }

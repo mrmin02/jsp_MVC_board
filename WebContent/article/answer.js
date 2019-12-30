@@ -1,83 +1,59 @@
-function drawAnswers(datas,user_id,admin){
-	$(".answers").empty();
-	datas.map((data)=>{
-		var userId = data.user_id;
-		var content = data.text;
-		
-		$(".answers").append(`ID<br>${userId}<br>내용<br><div class="newAnswer">${content}</div>`);
-		
-		if(user_id == userId){
-			console.log("글 작성자");
-			
-		}else if(admin == '1'){
-			console.log("관리자");
-		}
-
-	});
-}
-
-function addAnswer(article_id, user_id, admin){
+function addAnswer(article_id,user_id){
 	var answer = $("#answer_text").val();
-	if($.trim(answer).length == 0){
-		alert("댓글 내용을 입력해주세요");
-		return;
-	}
 	$.ajax({
 		type: "POST",
 		url: "/article/addAnswer.do",
-		dataType:"json",
-		data: {article_id:article_id,user_id:user_id,answer:answer},
-		success: function(data){
-//		   	화면에 다시 그리는 활동
-			console.log("ajax 성공");
-			drawAnswers(data,user_id,admin);
-		   },
-		error:function(err) {
-			console.log("에러발생");
-		},
+		data:{article_id:article_id,user_id:user_id,answer:answer},
+	}).done(function(data){
+		console.log("ajax 성공");
+		$(".answers").val('');
+		$(".answers").html(data);
 	});
-	
 }
 
-function deleteAnswer(answer_id,article_id,user_id,admin){
+function updateClick(article_id,answer_id){
+	var preAnswer = $(".answer"+answer_id).html();
+	$(".answerDiv"+answer_id).empty();
+	$(".answerDiv"+answer_id).append(`<textArea class="newAnswer${answer_id}">${preAnswer}</textArea>`);
+	$(".U_Button"+answer_id).html('');
+	$(".U_Button"+answer_id).append(`<button type="button" onclick="updateCommitClick('${article_id}','${answer_id}')">수정완료</button>`);	
+}
+
+function deleteClick(article_id,answer_id){
 	$.ajax({
 		type: "POST",
 		url: "/article/AnswerDelete.do",
-		dataType:"json",
-		data: {answer_id:answer_id,article_id:article_id},
-		success: function(data){
-//		   	화면에 다시 그리는 활동
-			console.log("ajax 성공");
-			drawAnswers(data,user_id,admin);
-		   },
-		error:function(err) {
-			console.log("에러발생");
-		},
+		data:{article_id:article_id,answer_id:answer_id},
+	}).done(function(data){
+		console.log("ajax 성공");
+		$(".answers").val('');
+		$(".answers").html(data);
 	});
 }
-
-function modifyAnswer(answer_id,article_id,user_id,admin){
-	var answer = $(".newText").val();
+function updateCommitClick(article_id,answer_id){
+	var newAnswer =  $(".newAnswer"+answer_id).val();
+	if(newAnswer==''){
+		return alert("수정할 내용을 입력해 주세요");
+	}
 	$.ajax({
 		type: "POST",
-		url: "/article/AnswerModify.do",
-		dataType:"json",
-		data: {answer_id:answer_id,article_id:article_id,answer:answer},
-		success: function(data){
-//		   	화면에 다시 그리는 활동
-			console.log("ajax 성공");
-			drawAnswers(data,user_id,admin);
-		   },
-		error:function(err) {
-			console.log("에러발생");
-		},
+		url: "/article/AnswerUpdate.do",
+		data:{article_id:article_id,answer_id:answer_id,newAnswer:newAnswer},
+	}).done(function(data){
+		console.log("ajax 성공");
+		$(".answers").val('');
+		$(".answers").html(data);
 	});
 }
-
-function click_modify(text,answer_id,article_id,user_id,admin){
-	$(".newAnswer").empty();
-	$(".newAnswer").append(`<textArea class="newText">${text}</textArea>`);
-	$(".newButton").empty();
-	$(".newButton").append(`<button type="button" onclick="modifyAnswer('${answer_id}','${article_id}','${user_id}','${admin}')">수정 완료</button>`);
-}
-//console.log(`request.getParameter('id')`);
+$(document).ready(function(){
+	var	article_id = window.location.search.split('?')[1].split('=')[1]
+	$.ajax({
+		type: "GET",
+		url: "/article/AnswerLoding.do",
+		data:{article_id:article_id},
+	}).done(function(data){
+		console.log("ajax 성공");
+		$(".answers").val('');
+		$(".answers").html(data);
+	});
+});
